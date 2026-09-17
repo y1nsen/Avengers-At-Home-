@@ -122,3 +122,16 @@ npm run server
 ├── package.json
 └── vite.config.js
 ```
+
+---
+
+## 💡 Assets & Build Architecture (`public/` vs `dist/`)
+
+- **`public/` (Source Assets)**:
+  The authoritative source folder for all static assets (3D GLB models, card artwork with ArUco markers, compiled `targets.mind`, and UI icons). Always add or modify your game assets here.
+- **`dist/` (Build Output)**:
+  Generated automatically when running `npm run build`. Vite bundles the code in `src/` and copies all files from `public/` into `dist/` for production deployment. `dist/` is an ephemeral build artifact, ignored by Git, and can be safely cleaned anytime via:
+  ```bash
+  npm run clean
+  ```
+

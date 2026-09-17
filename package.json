@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "server": "node server/server.js",
     "compile:mind": "node compile_cards.js",
+    "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true})\"",
     "dev:https": "vite --host --mode https"
   },
   "dependencies": {
