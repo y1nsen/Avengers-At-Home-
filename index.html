@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Avengers Assemble: AR Card Battler</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,900;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="app" class="game-container">
+    <!-- 3D / WebAR Viewport Container -->
+    <div id="three-container"></div>
+
+    <!-- Rotate Device Prompt (Landscape Only Enforcement) -->
+    <div id="rotate-prompt" class="rotate-prompt-overlay">
+      <div class="rotate-card">
+        <div class="rotate-phone-icon">📱 ↷</div>
+        <h2 class="rotate-title">Please Rotate Your Phone</h2>
+        <p class="rotate-desc">Avengers Assemble is built exclusively for <strong>Landscape Mode</strong> to track tabletop AR cards.</p>
+        <button id="btn-force-fullscreen" class="figma-btn primary">Enter Fullscreen</button>
+      </div>
+    </div>
+
+    <!-- Left Navigation Bar (Frame 31) -->
+    <aside id="sidebar" class="sidebar">
+      <div id="sidebar-top-action" class="sidebar-action">
+        <img id="sidebar-logo" src="/assets/logo.svg" alt="Avengers" class="sidebar-logo">
+        <button id="sidebar-hamburger" class="icon-btn hidden" aria-label="Menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+        <button id="sidebar-close" class="icon-btn hidden" aria-label="Close">
+          ✕
+        </button>
+      </div>
+      <div id="sidebar-bottom-action" class="sidebar-action">
+        <button id="btn-fullscreen-toggle" class="icon-btn" title="Toggle Fullscreen" aria-label="Fullscreen">
+          ⛶
+        </button>
+        <button id="sidebar-settings" class="settings-btn" aria-label="Settings">
+          ⚙
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Dynamic Overlay Screens Container -->
+    <main id="ui-stage" class="ui-stage">
+
+      <!-- 1. Landing Screen (Landing UI) -->
+      <section id="screen-landing" class="screen active">
+        <div class="center-menu">
+          <button id="btn-play-landing" class="figma-btn primary">Play</button>
+          <button id="btn-join-landing" class="figma-btn outline">Join Room</button>
+          <button id="btn-exit-landing" class="figma-btn outline">Exit</button>
+        </div>
+      </section>
+
+      <!-- 2. Joining Room Screen -->
+      <section id="screen-join" class="screen">
+        <div class="center-menu">
+          <input id="input-room-code" type="text" maxlength="6" placeholder="Enter Room Code" class="figma-input code-input">
+          <div class="btn-row">
+            <button id="btn-join-cancel" class="figma-btn outline red-text">Cancel</button>
+            <button id="btn-join-submit" class="figma-btn primary">Join</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Username Screen -->
+      <section id="screen-username" class="screen">
+        <div class="center-menu">
+          <h2 id="room-joined-title" class="gradient-title">Room #3031 joined!</h2>
+          <div class="input-with-badge">
+            <div class="bolt-badge">⚡</div>
+            <input id="input-username" type="text" placeholder="Enter a username" class="figma-input user-input" value="User567">
+          </div>
+          <div class="btn-row">
+            <button id="btn-user-cancel" class="figma-btn outline red-text">Cancel</button>
+            <button id="btn-user-play" class="figma-btn primary">Play</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Hero Selection Screen (Frame 48 & Frame 45) -->
+      <section id="screen-hero-select" class="screen">
+        <div class="selection-layout">
+          <div class="selection-main">
+            <h1 id="hero-selection-title" class="page-title">Hero Selection</h1>
+            <div id="hero-grid" class="hero-grid">
+              <!-- 9 Hero Circles injected via JS -->
+            </div>
+            <button id="btn-hero-continue" class="figma-btn full-width disabled">Select to continue</button>
+          </div>
+
+          <!-- Hero Details Drawer (Frame 53) -->
+          <aside id="hero-drawer" class="hero-drawer hidden">
+            <div class="drawer-portrait-frame">
+              <img id="drawer-avatar" src="/assets/ui/profile/spiderman.webp" alt="Hero Avatar" class="drawer-avatar">
+            </div>
+            <h2 id="drawer-hero-name" class="drawer-hero-name">Spiderman</h2>
+
+            <div class="drawer-stats">
+              <div class="stat-group">
+                <span class="stat-label">Category</span>
+                <span id="drawer-category" class="stat-value blue-text">Fighter</span>
+              </div>
+
+              <div class="stat-group">
+                <span class="stat-label">Max Health</span>
+                <div class="stat-bar-row">
+                  <span id="drawer-hp-val" class="stat-val-num">120</span>
+                  <div class="bar-track">
+                    <div id="drawer-hp-bar" class="bar-fill green-fill" style="width: 100%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="stat-group">
+                <span class="stat-label">Attack Strength</span>
+                <div class="stat-bar-row">
+                  <span id="drawer-atk-val" class="stat-val-num">50</span>
+                  <div class="bar-track">
+                    <div id="drawer-atk-bar" class="bar-fill blue-fill" style="width: 62%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="stat-group">
+                <span class="stat-label">Ultimate</span>
+                <span id="drawer-ult-desc" class="stat-value blue-text">+20 Attack Strength Boost</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- 4.5 Card Scanning Screen (Card Scan.png & Card Scan 2.png) -->
+      <section id="screen-card-scan" class="screen">
+        <h1 id="scan-title" class="scan-title">Scanning Card</h1>
+
+        <div class="scan-viewport-wrapper">
+          <div id="scan-window" class="scan-window"></div>
+        </div>
+
+        <div class="scan-btn-row">
+          <button id="btn-scan-cancel" class="figma-btn outline red-text">Cancel</button>
+          <button id="btn-scan-action" class="figma-btn disabled">Done</button>
+        </div>
+      </section>
+
+      <!-- 5. In-Game Combat HUD (In game UI) -->
+      <section id="screen-combat" class="screen">
+        <!-- Holographic Card Scanning Reticle Overlay -->
+        <div id="ar-scanning-overlay" class="ar-scanning-overlay">
+          <div class="reticle-box">
+            <div class="reticle-corner top-left"></div>
+            <div class="reticle-corner top-right"></div>
+            <div class="reticle-corner bottom-left"></div>
+            <div class="reticle-corner bottom-right"></div>
+            <div class="scan-laser"></div>
+          </div>
+          <div class="scan-info-bubble">
+            <p id="scanning-prompt-text" class="scanning-prompt">Point camera at your card to summon <span id="scanning-hero-name">Hero</span></p>
+            <button id="btn-manual-sim-scan" class="pill-chip secondary">Simulate Card Scan (Desktop Test)</button>
+          </div>
+        </div>
+
+        <!-- Top HUD Player Bar (Frame 29) -->
+        <header class="hud-top-bar">
+          <!-- Left Player (Player 1) -->
+          <div class="player-hud-card left">
+            <div class="hud-avatar-ring yellow-ring">
+              <img id="hud-p1-avatar" src="/assets/ui/profile/spiderman.webp" alt="P1 Avatar" class="hud-avatar">
+            </div>
+            <div class="player-hud-info">
+              <div class="player-name-row">
+                <span id="hud-p1-username" class="hud-username">User567</span>
+              </div>
+              <span id="hud-p1-hero-name" class="hud-hero-name">Spiderman</span>
+              <div class="hp-bar-row">
+                <span id="hud-p1-hp" class="hp-number">120</span>
+                <div class="hp-track">
+                  <div id="hud-p1-hp-bar" class="hp-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Match Banner / Turn Announcement -->
+          <div id="turn-announcement" class="turn-announcement">
+            <span id="turn-banner-text">SCAN HERO CARD</span>
+          </div>
+
+          <!-- Right Player (Player 2 / AI) -->
+          <div class="player-hud-card right">
+            <div class="player-hud-info align-right">
+              <div class="player-name-row">
+                <span id="hud-p2-username" class="hud-username">User123</span>
+              </div>
+              <span id="hud-p2-hero-name" class="hud-hero-name">Spiderman</span>
+              <div class="hp-bar-row">
+                <div class="hp-track">
+                  <div id="hud-p2-hp-bar" class="hp-fill" style="width: 100%;"></div>
+                </div>
+                <span id="hud-p2-hp" class="hp-number">120</span>
+              </div>
+            </div>
+            <div class="hud-avatar-ring yellow-ring">
+              <img id="hud-p2-avatar" src="/assets/ui/profile/spiderman.webp" alt="P2 Avatar" class="hud-avatar">
+            </div>
+          </div>
+        </header>
+
+        <!-- Bottom Left Action Buttons -->
+        <div class="combat-actions">
+          <button id="btn-attack" class="combat-btn attack-btn disabled">
+            <span>Attack</span>
+          </button>
+          <button id="btn-ultimate" class="combat-btn ultimate-btn disabled">
+            <span>Ultimate</span>
+            <div id="ult-meter-indicator" class="meter-fill-glow"></div>
+          </button>
+        </div>
+
+        <!-- Bottom Right Reserve Squad (Frame 30) -->
+        <div class="reserve-squad" id="reserve-squad">
+          <!-- Reserve squad hero circles injected dynamically -->
+        </div>
+
+        <!-- Tactical Intercept Reaction Modal (Phase 2) -->
+        <div id="intercept-modal" class="modal-backdrop hidden">
+          <div class="intercept-card">
+            <h3 class="intercept-title">INCOMING ATTACK!</h3>
+            <p id="intercept-desc" class="intercept-desc">Opponent is striking for 50 DMG. React before damage resolves!</p>
+            <div class="intercept-actions">
+              <button id="btn-hold-ground" class="figma-btn outline">Hold Ground</button>
+              <div id="swap-options" class="swap-options">
+                <!-- Reserve heroes that can be swapped in -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Pause Menu Overlay -->
+      <section id="screen-pause" class="screen pause-screen hidden">
+        <button id="btn-pause-screen-close" class="pause-close-btn" aria-label="Close">✕</button>
+        <div class="center-menu">
+          <button id="btn-pause-resume" class="figma-btn white-pill">Resume</button>
+          <button id="btn-pause-settings" class="figma-btn white-pill">Settings</button>
+          <button id="btn-pause-exit" class="figma-btn red-pill">Exit</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

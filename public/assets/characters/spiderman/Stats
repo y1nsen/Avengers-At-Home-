@@ -1,0 +1,32 @@
+========================================
+AVENGERS ASSEMBLE: CHARACTER STATS
+Hero: Spider-Man
+Class: Fighter
+========================================
+
+[VITAL ATTRIBUTES]
+Max Health (HP): 120
+Base Attack (ATK): 50
+
+[TACTICAL MATRIX]
+Role: Fighter
+Passive Trait: Spider-Sense Agility: High evasive readiness and quick recovery.
+
+[ULTIMATE ABILITY]
+Ability Name: Overdrive (+20 Attack Strength Boost)
+Trigger Condition: Deal 100 DMG (2 hits dealt)
+Description:
+Next attack deals devastating boost damage (+20 to +30 ATK). Web Strike empowers Spider-Man to overwhelm the vanguard.
+
+[ANIMATION SCHEMA]
+- Intro: Emerging from card (0.8s - 1.5s)
+- Idle: Combat stance loop
+- Attack_Standard: Strike action (50 DMG)
+- Attack_Ultimate: Finisher action
+- Hit_Low: Light flinch (< 30 DMG)
+- Hit_Medium: Moderate stumble (30 - 55 DMG)
+- Hit_Heavy: Severe recoil (> 55 DMG)
+- Defend: Intercept pose
+- Win: Victory stance
+- Die: Knockout clamp
+========================================
