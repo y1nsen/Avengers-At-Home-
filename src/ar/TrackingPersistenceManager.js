@@ -25,7 +25,7 @@ export class TrackingPersistenceManager {
     this.hasGyro = false;
     this.deviceQuaternion = new THREE.Quaternion();
     this.refDeviceQuaternion = new THREE.Quaternion();
-    this.screenOrientationAngle = 90; // Default landscape
+    this.screenOrientationAngle = 0; // Default portrait
 
     // Math caches
     this._degToRad = Math.PI / 180;
@@ -48,8 +48,8 @@ export class TrackingPersistenceManager {
       if (event.alpha === null || event.beta === null || event.gamma === null) return;
       this.hasGyro = true;
 
-      // Determine landscape angle
-      let angle = 90;
+      // Determine screen angle (0 for portrait)
+      let angle = 0;
       if (window.screen && window.screen.orientation && window.screen.orientation.angle !== undefined) {
         angle = window.screen.orientation.angle;
       } else if (window.orientation !== undefined) {

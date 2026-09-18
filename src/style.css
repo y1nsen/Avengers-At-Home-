@@ -1,31 +1,31 @@
 /* ==========================================================================
-   Avengers Assemble: AR Card Battler - Design System & UI Styles
-   Pixel-faithful to Figma References (2077 x 1080 canvas)
-   Fluid dvh/vw scaling tailored for Nothing Phone 2a (20:9 landscape)
+   Avengers Assemble: AR Card Battler - Portrait UI Design System
+   Pixel-faithful to Figma References (1080 x 2412 base ratio, Nothing Phone 2a)
+   Fluid dvh/vw responsive scaling for mobile viewports
    ========================================================================== */
 
 :root {
-  /* Color Palette matching Figma */
+  /* Figma Color Tokens */
   --game-black: #202020;
   --game-white: #FFFFFF;
   --game-blue: #0059FF;
   --game-yellow: #FFD900;
   --game-red: #FF0000;
+  --game-navy: #092E86;
   --neutral-100: #FFFFFF;
-  --neutral-200: #ECECEC;
-  --neutral-300: #D9D9D9;
+  --neutral-200: #F4F5F5;
+  --neutral-300: #DFE0E2;
   --neutral-400: #C5C5C5;
-  --neutral-600: #94979E;
-  --neutral-800: #444444;
-  --green-bar: linear-gradient(90deg, #44FF00 0%, #C4FFB2 100%);
+  --neutral-600: #8F9098;
+  --neutral-800: #333333;
   --hp-green: #44FF00;
 
-  /* Fluid Viewport Sizing (1080px base canvas = 100dvh) */
-  --sidebar-w: clamp(54px, 14.537dvh, 157px);
-  --btn-h: clamp(44px, 9.722dvh, 105px);
-  --btn-border: max(3px, 0.555dvh);
-  --btn-radius: 9999px;
-  --font-family: 'Poppins', sans-serif;
+  /* Typography */
+  --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Sizing tokens */
+  --header-h: clamp(56px, 7.5dvh, 76px);
+  --nav-h: clamp(60px, 7.5dvh, 80px);
 }
 
 * {
@@ -38,109 +38,164 @@
 }
 
 html, body {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   height: 100dvh;
   overflow: hidden;
-  background-color: #000000;
   font-family: var(--font-family);
+  background-color: #000000;
   color: var(--game-black);
 }
 
-.game-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+body.portrait-body {
   display: flex;
-  overflow: hidden;
+  justify-content: center;
+  align-items: center;
 }
 
 /* ==========================================================================
-   3D & WebAR Viewport Container
+   App Container
+   ========================================================================== */
+.portrait-app {
+  position: relative;
+  width: 100vw;
+  max-width: 500px;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--game-white);
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 501px) {
+  .portrait-app {
+    box-shadow: 0 0 45px rgba(0, 0, 0, 0.75);
+    border-radius: 18px;
+  }
+}
+
+/* WebAR & Camera transparency guarantee */
+body.ar-active,
+body.ar-active .portrait-app,
+body.ar-active #ui-stage,
+body.ar-active #screen-combat,
+body.ar-active #screen-card-scan {
+  background: transparent !important;
+}
+
+/* ==========================================================================
+   3D / WebAR Viewport Container
    ========================================================================== */
 #three-container {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  width: 100%;
+  height: 100%;
   z-index: 1;
-  background: radial-gradient(circle at center, #1b1e2b 0%, #0c0d14 100%);
+  background: transparent;
   overflow: hidden;
+  pointer-events: auto;
+}
+
+#three-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
 
 /* ==========================================================================
-   Left Navigation Sidebar (Frame 31)
+   Top Header (Figma Header)
    ========================================================================== */
-.sidebar {
+.top-header {
   position: absolute;
-  left: 0;
   top: 0;
-  bottom: 0;
-  width: var(--sidebar-w);
-  height: 100vh;
-  height: 100dvh;
+  left: 0;
+  right: 0;
+  height: var(--header-h);
   background: var(--game-black);
+  z-index: 60;
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: clamp(16px, 3.7dvh, 40px) clamp(8px, 1.48dvh, 16px);
-  padding-left: max(clamp(8px, 1.48dvh, 16px), env(safe-area-inset-left));
-  z-index: 60;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
+  padding: 0 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
-.sidebar-action {
+.header-left {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-fs-btn {
+  width: clamp(38px, 5dvh, 46px);
+  height: clamp(38px, 5dvh, 46px);
+  border-radius: 50%;
+  background: var(--game-white);
+  border: 2.5px solid var(--game-blue);
+  display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  gap: clamp(10px, 2dvh, 20px);
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: transform 0.15s ease;
+}
+.header-fs-btn:active {
+  transform: scale(0.92);
+}
+.header-fs-btn img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
 }
 
-.sidebar-logo {
-  width: clamp(30px, 6.3dvh, 68px);
-  height: auto;
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35));
-  transition: transform 0.2s ease;
+.subheader-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.sidebar-logo:hover {
-  transform: scale(1.06);
-}
-
-.icon-btn, .settings-btn {
-  background: transparent;
+.sub-back-btn {
+  background: none;
   border: none;
   color: var(--game-white);
-  font-size: clamp(20px, 3.88dvh, 42px);
+  font-size: clamp(26px, 3.5dvh, 32px);
+  font-weight: 600;
   cursor: pointer;
-  outline: none;
+  line-height: 1;
+  padding: 0 4px;
+}
+.subheader-title {
+  color: var(--game-white);
+  font-size: clamp(15px, 2.2dvh, 20px);
+  font-weight: 600;
+}
+
+.header-right {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.header-user-id {
+  color: var(--game-white);
+  font-size: clamp(14px, 2dvh, 18px);
+  font-weight: 600;
+}
+.header-avatar-circle {
+  width: clamp(36px, 4.8dvh, 44px);
+  height: clamp(36px, 4.8dvh, 44px);
+  border-radius: 50%;
+  background: var(--game-blue);
+  display: flex;
   justify-content: center;
   align-items: center;
-  gap: clamp(4px, 0.55dvh, 6px);
-  transition: transform 0.2s, opacity 0.2s;
+  color: var(--game-white);
 }
-.icon-btn:hover, .settings-btn:hover {
-  transform: scale(1.1);
-  opacity: 0.85;
-}
-
-.icon-btn .bar {
-  display: block;
-  width: clamp(22px, 3.33dvh, 36px);
-  height: max(2px, 0.37dvh);
-  background-color: var(--game-white);
-  border-radius: 2px;
-}
-
-.hidden {
-  display: none !important;
+.header-avatar-svg {
+  width: 65%;
+  height: 65%;
 }
 
 /* ==========================================================================
@@ -148,12 +203,12 @@ html, body {
    ========================================================================== */
 .ui-stage {
   position: absolute;
-  top: 0;
-  left: var(--sidebar-w);
-  width: calc(100vw - var(--sidebar-w));
-  height: 100vh;
-  height: 100dvh;
-  z-index: 10;
+  top: var(--header-h);
+  bottom: var(--nav-h);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  overflow: hidden;
   pointer-events: none;
 }
 
@@ -165,586 +220,836 @@ html, body {
   height: 100%;
   display: none;
   pointer-events: auto;
-  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
-
 .screen.active {
   display: flex;
+  opacity: 1;
 }
 
-/* White canvases for Menus */
-#screen-landing,
-#screen-join,
-#screen-username {
-  background: var(--game-white);
+.hidden {
+  display: none !important;
 }
 
 /* ==========================================================================
-   Center Menus (Landing, Join, Username)
+   1. Home Screen (Portrat UI - Home)
    ========================================================================== */
-.center-menu {
-  margin: auto;
+#screen-home {
+  background: var(--game-white);
+}
+.home-screen-content {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: clamp(14px, 2.6dvh, 28px);
-  width: 90%;
-  max-width: min(760px, 70.37dvh);
+  justify-content: space-between;
+  padding: clamp(14px, 2dvh, 24px) clamp(16px, 4vw, 24px);
 }
 
-/* Figma Standardized Buttons */
-.figma-btn {
-  width: min(51.85dvh, 76vw);
-  max-width: 560px;
-  height: var(--btn-h);
-  border-radius: var(--btn-radius);
-  font-family: var(--font-family);
-  font-size: clamp(18px, 3.88dvh, 42px);
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  border: var(--btn-border) solid var(--game-black);
-  outline: none;
-  padding: 0 clamp(16px, 3dvh, 36px);
-}
-.figma-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
-}
-.figma-btn:active {
-  transform: translateY(1px);
-}
-
-.figma-btn.primary {
-  background: var(--game-blue);
-  color: var(--game-white);
-}
-
-.figma-btn.outline {
-  background: var(--game-white);
-  color: var(--game-black);
-}
-
-.figma-btn.red-text {
-  color: var(--game-red);
-}
-
-.figma-btn.white-pill {
-  background: var(--game-white);
-  color: var(--game-black);
-  border: none;
-}
-
-.figma-btn.red-pill {
-  background: var(--game-red);
-  color: var(--game-white);
-  border: none;
-}
-
-.figma-btn.disabled {
-  background: var(--neutral-300);
-  color: var(--neutral-600);
-  cursor: not-allowed;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-.figma-btn.full-width {
+.changelog-card {
   width: 100%;
-  max-width: min(80.5dvh, 85vw);
-  height: var(--btn-h);
-}
-
-/* Figma Inputs */
-.figma-input {
-  width: min(70.37dvh, 82vw);
-  max-width: 760px;
-  height: var(--btn-h);
-  background: var(--neutral-300);
-  border: var(--btn-border) solid var(--game-black);
-  border-radius: var(--btn-radius);
-  font-family: var(--font-family);
-  font-size: clamp(16px, 3.33dvh, 36px);
-  font-weight: 700;
-  text-align: center;
-  color: var(--game-black);
-  outline: none;
-  padding: 0 clamp(16px, 3dvh, 32px);
-}
-.figma-input::placeholder {
-  color: var(--neutral-600);
-}
-
-.btn-row {
-  display: flex;
-  gap: clamp(12px, 2.22dvh, 24px);
-  width: min(70.37dvh, 82vw);
-  max-width: 760px;
-}
-.btn-row .figma-btn {
-  flex: 1;
-  width: auto;
-  max-width: none;
-}
-
-.input-with-badge {
-  display: flex;
-  align-items: center;
-  gap: clamp(10px, 1.85dvh, 20px);
-  width: min(70.37dvh, 82vw);
-  max-width: 760px;
-}
-.input-with-badge .figma-input {
-  flex: 1;
-  width: auto;
-  max-width: none;
-}
-
-.bolt-badge {
-  width: var(--btn-h);
-  height: var(--btn-h);
-  border-radius: 50%;
-  background: var(--game-red);
-  color: var(--game-yellow);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(20px, 4.2dvh, 46px);
-  font-weight: 900;
-  flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(255, 0, 0, 0.35);
-}
-
-.gradient-title {
-  font-size: clamp(20px, 5dvh, 54px);
-  font-weight: 700;
-  text-align: center;
-  background: var(--green-bar);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: clamp(6px, 1.8dvh, 20px);
-}
-
-/* ==========================================================================
-   Hero Selection Screen (Frame 48 & Frame 45 / Frame 53)
-   ========================================================================== */
-.selection-layout {
-  display: flex;
-  width: 100%;
-  height: 100%;
+  max-width: 400px;
   background: var(--game-white);
-  overflow: hidden;
-}
-
-.selection-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(10px, 2.5dvh, 32px) clamp(16px, 2vw, 40px);
-  gap: clamp(10px, 2.6dvh, 30px);
-  height: 100%;
-}
-
-.page-title {
-  font-size: clamp(20px, 4.4dvh, 48px);
-  font-weight: 700;
-  color: var(--game-black);
-  text-align: center;
-}
-
-.hero-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(8px, 2.6dvh, 28px);
-}
-
-.hero-card-slot {
+  border: 3px solid var(--game-navy);
+  border-radius: 20px;
+  padding: clamp(14px, 2dvh, 20px);
   position: relative;
-  width: clamp(54px, 15.46dvh, 167px);
-  height: clamp(54px, 15.46dvh, 167px);
-  border-radius: 50%;
-  background: var(--neutral-200);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  overflow: visible;
+  margin-top: 10px;
+  box-shadow: 0 4px 14px rgba(9, 46, 134, 0.08);
 }
-.hero-card-slot:hover {
-  transform: scale(1.06);
-}
-
-.hero-slot-img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.hero-card-slot.selected {
-  outline: var(--btn-border) solid var(--game-blue);
-  outline-offset: 2px;
-}
-
-.hero-badge-num {
+.changelog-pill-badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
-  width: clamp(18px, 2.96dvh, 32px);
-  height: clamp(18px, 2.96dvh, 32px);
-  border-radius: 50%;
-  background: var(--game-blue);
-  border: max(2px, 0.35dvh) solid var(--game-white);
+  top: -14px;
+  left: 18px;
+  background: var(--game-navy);
   color: var(--game-white);
-  font-size: clamp(10px, 1.6dvh, 16px);
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* Hero Details Drawer (Frame 53) */
-.hero-drawer {
-  width: clamp(240px, 52.77dvh, 570px);
-  height: 100%;
-  background: var(--game-black);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(16px, 3.7dvh, 40px) clamp(16px, 2.2vw, 32px);
-  padding-right: max(clamp(16px, 2.2vw, 32px), env(safe-area-inset-right));
-  gap: clamp(10px, 2.2dvh, 26px);
-  color: var(--game-white);
-  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.5);
-  animation: slideIn 0.25s ease;
-  z-index: 20;
-  flex-shrink: 0;
-}
-
-@keyframes slideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
-}
-
-.drawer-portrait-frame {
-  width: clamp(90px, 28.7dvh, 310px);
-  height: clamp(90px, 28.7dvh, 310px);
-  border-radius: 50%;
-  background: var(--neutral-200);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-}
-.drawer-avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.drawer-hero-name {
-  font-size: clamp(20px, 4.44dvh, 48px);
-  font-weight: 700;
-  text-align: center;
-  color: var(--game-white);
-}
-
-.drawer-stats {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(6px, 1.6dvh, 16px);
-}
-
-.stat-group {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(2px, 0.55dvh, 6px);
-}
-
-.stat-label {
-  font-size: clamp(11px, 1.66dvh, 18px);
-  font-weight: 700;
-  color: var(--game-white);
-}
-
-.stat-value {
-  font-size: clamp(11px, 1.66dvh, 18px);
+  padding: 3px 14px;
+  border-radius: 9999px;
+  font-size: clamp(11px, 1.4dvh, 13px);
   font-weight: 600;
-}
-
-.blue-text {
-  color: var(--game-blue) !important;
-}
-
-.stat-bar-row {
   display: flex;
   align-items: center;
-  gap: clamp(8px, 1.3dvh, 14px);
+  gap: 6px;
+}
+.sync-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+.changelog-list {
+  list-style: disc inside;
+  font-size: clamp(11px, 1.45dvh, 13px);
+  font-weight: 500;
+  color: #1a1a1a;
+  line-height: 1.6;
+  padding-top: 4px;
 }
 
-.stat-val-num {
-  font-size: clamp(11px, 1.66dvh, 18px);
-  font-weight: 600;
-  width: clamp(24px, 3.3dvh, 36px);
-}
-
-.bar-track {
+.home-logo-container {
   flex: 1;
-  height: clamp(7px, 1.2dvh, 13px);
-  background: var(--neutral-800);
-  border-radius: 9999px;
-  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px 0;
+}
+.home-avengers-logo {
+  max-width: 82%;
+  max-height: clamp(130px, 20dvh, 220px);
+  object-fit: contain;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.15));
 }
 
-.bar-fill {
-  height: 100%;
-  border-radius: 9999px;
-  transition: width 0.35s ease;
+.home-play-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: clamp(14px, 2.5dvh, 32px);
 }
-.bar-fill.green-fill {
-  background: var(--hp-green);
-}
-.bar-fill.blue-fill {
+.circle-play-btn {
+  width: clamp(160px, 44vw, 240px);
+  height: clamp(160px, 44vw, 240px);
+  border-radius: 50%;
   background: var(--game-blue);
+  border: 4px solid #000000;
+  color: var(--game-white);
+  font-family: var(--font-family);
+  font-size: clamp(34px, 8vw, 48px);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 10px 28px rgba(0, 89, 255, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+}
+.circle-play-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 4px 14px rgba(0, 89, 255, 0.3);
 }
 
 /* ==========================================================================
-   In-Game Combat HUD (In game UI.png)
+   2. Server Screen (Portrat UI - Server)
    ========================================================================== */
-#screen-combat {
-  position: absolute;
-  top: 0;
-  left: 0;
+#screen-server {
+  background: var(--game-white);
+}
+.server-screen-content {
   width: 100%;
   height: 100%;
-  pointer-events: none;
-  background: transparent !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+.server-card-box {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.server-input-wrapper {
+  width: 100%;
+  margin-bottom: 12px;
+}
+.server-pill-input {
+  width: 100%;
+  height: clamp(52px, 7dvh, 68px);
+  border-radius: 9999px;
+  background: var(--neutral-300);
+  border: 3px solid var(--game-black);
+  font-family: var(--font-family);
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--game-black);
+  letter-spacing: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+.server-pill-input::placeholder {
+  color: var(--game-blue);
+  letter-spacing: 10px;
+}
+.server-pill-btn {
+  width: 100%;
+  height: clamp(48px, 6dvh, 56px);
+  border-radius: 9999px;
+  background: var(--game-blue);
+  border: 3px solid #000000;
+  color: var(--game-white);
+  font-family: var(--font-family);
+  font-size: clamp(16px, 2.2dvh, 18px);
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.12s ease;
+}
+.server-pill-btn:active {
+  transform: scale(0.97);
 }
 
-/* Top Player Status Bar */
-.hud-top-bar {
+.server-or-divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: clamp(20px, 3.5dvh, 36px) 0;
+}
+.divider-line {
+  flex: 1;
+  height: 2px;
+  background: var(--neutral-300);
+}
+.divider-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000000;
+}
+
+.server-code-display-wrap {
+  width: 100%;
+  height: clamp(52px, 7dvh, 68px);
+  border-radius: 9999px;
+  background: var(--neutral-300);
+  border: 3px solid var(--game-black);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.display-code-text {
+  font-size: clamp(26px, 3.5dvh, 32px);
+  font-weight: 700;
+  color: var(--game-blue);
+  letter-spacing: 12px;
+}
+
+/* ==========================================================================
+   3. Hero Selection Screen (Portrat UI - Home-1)
+   ========================================================================== */
+#screen-hero-select {
+  background: var(--game-white);
+}
+.hero-select-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(10px, 1.5dvh, 18px) 16px clamp(12px, 2dvh, 20px);
+}
+
+.hero-carousel-container {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+.carousel-arrow {
   position: absolute;
-  top: max(12px, env(safe-area-inset-top));
-  left: max(16px, env(safe-area-inset-left));
-  right: max(16px, env(safe-area-inset-right));
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(32, 32, 32, 0.7);
+  color: var(--game-white);
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
+}
+.carousel-arrow.prev { left: 4px; }
+.carousel-arrow.next { right: 4px; }
+
+.carousel-track-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carousel-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Hero Carousel Card */
+.hero-card-display {
+  width: min(72vw, 290px);
+  height: min(94vw, 380px);
+  border-radius: 22px;
+  border: 4px solid var(--game-blue);
+  background: var(--game-white);
+  box-shadow: 0 10px 30px rgba(0, 89, 255, 0.25);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.card-img-layer {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-fallback-frame {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  background: radial-gradient(circle at center, #fbfbfb 0%, #ececec 100%);
+}
+.card-fallback-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  pointer-events: auto;
+}
+.card-hero-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--game-black);
+}
+.card-hero-class {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--game-blue);
+}
+.card-fallback-avatar {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+.card-fallback-stats {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #333;
 }
 
-.player-hud-card {
+.card-action-overlay {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
   display: flex;
-  align-items: center;
-  gap: clamp(10px, 1.85dvh, 20px);
-  background: transparent;
-}
-
-.hud-avatar-ring {
-  width: clamp(52px, 13.7dvh, 148px);
-  height: clamp(52px, 13.7dvh, 148px);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  border: max(3px, 0.74dvh) solid var(--game-yellow);
-  background: var(--neutral-200);
-  overflow: hidden;
-  flex-shrink: 0;
 }
-.hud-avatar {
+.btn-card-add-toggle {
+  height: 42px;
+  padding: 0 24px;
+  border-radius: 9999px;
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+.btn-card-add-toggle.add-mode {
+  background: var(--game-white);
+  border: 2.5px solid var(--game-black);
+  color: var(--game-blue);
+}
+.btn-card-add-toggle.added-mode {
+  background: var(--game-blue);
+  border: 2.5px solid var(--game-blue);
+  color: var(--game-white);
+  box-shadow: 0 4px 14px rgba(0, 89, 255, 0.4);
+}
+
+/* Draft Tray (3 Hero Slots) */
+.hero-draft-tray {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(12px, 3.5vw, 22px);
+  margin: clamp(6px, 1.2dvh, 14px) 0;
+  width: 100%;
+}
+.draft-slot {
+  width: clamp(58px, 15vw, 74px);
+  height: clamp(58px, 15vw, 74px);
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.draft-slot.empty {
+  border: 2.5px dashed var(--neutral-600);
+  background: var(--neutral-200);
+}
+.slot-plus {
+  font-size: 26px;
+  color: var(--neutral-600);
+  line-height: 1;
+}
+.draft-slot.filled {
+  border: 3px solid var(--game-blue);
+  background: var(--game-white);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.draft-slot.filled img {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   object-fit: cover;
 }
 
-.player-hud-info {
+/* Active Slot Wings */
+.draft-slot.active-wings {
+  transform: scale(1.15);
+  z-index: 5;
+}
+.draft-slot.active-wings::before {
+  content: '';
+  position: absolute;
+  width: 146%;
+  height: 58%;
+  background: var(--game-blue);
+  border-radius: 9999px;
+  z-index: -1;
+}
+
+/* Continue Pill Button */
+.figma-pill-action-btn {
+  width: 100%;
+  max-width: 380px;
+  height: clamp(46px, 6dvh, 54px);
+  border-radius: 9999px;
+  font-family: var(--font-family);
+  font-size: clamp(16px, 2.2dvh, 18px);
+  font-weight: 700;
+  border: 3px solid var(--game-black);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+}
+.figma-pill-action-btn.disabled {
+  background: var(--neutral-300);
+  border-color: var(--game-black);
+  color: var(--neutral-600);
+  cursor: not-allowed;
+}
+.figma-pill-action-btn:not(.disabled) {
+  background: var(--game-blue);
+  border-color: #000000;
+  color: var(--game-white);
+  box-shadow: 0 6px 20px rgba(0, 89, 255, 0.4);
+}
+.figma-pill-action-btn:not(.disabled):active {
+  transform: scale(0.97);
+}
+
+/* ==========================================================================
+   4. Card Scan Screen (Portrat UI - Home-2)
+   ========================================================================== */
+#screen-card-scan {
+  background: var(--game-white);
+}
+.card-scan-content {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: clamp(1px, 0.37dvh, 4px);
-  min-width: clamp(120px, 20dvh, 220px);
-}
-.player-hud-info.align-right {
-  align-items: flex-end;
-  text-align: right;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(10px, 1.5dvh, 16px) 16px clamp(12px, 2dvh, 20px);
 }
 
-.hud-username {
-  font-size: clamp(15px, 2.6dvh, 28px);
-  font-weight: 700;
-  color: var(--game-black);
+.scan-viewport-window {
+  width: min(76vw, 300px);
+  height: min(100vw, 390px);
+  border-radius: 24px;
+  border: 3.5px solid var(--game-black);
+  background: rgba(220, 220, 220, 0.25);
+  position: relative;
+  overflow: hidden;
+  margin-top: 6px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.scan-viewport-window.scanned {
+  border-color: var(--hp-green);
+  box-shadow: 0 0 28px rgba(68, 255, 0, 0.5);
 }
 
-.hud-hero-name {
-  font-size: clamp(11px, 1.85dvh, 20px);
-  font-style: italic;
+.scan-corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 4px solid var(--game-blue);
+}
+.scan-corner.tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+.scan-corner.tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+.scan-corner.bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+.scan-corner.br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+.scan-laser-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--game-blue), transparent);
+  box-shadow: 0 0 12px var(--game-blue);
+  animation: laserScan 2.5s infinite ease-in-out;
+}
+@keyframes laserScan {
+  0% { top: 8%; opacity: 0.2; }
+  50% { top: 88%; opacity: 1; }
+  100% { top: 8%; opacity: 0.2; }
+}
+
+.scan-status-badge {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(32, 32, 32, 0.85);
+  color: var(--game-white);
+  padding: 4px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.scan-instruction-prompt {
+  max-width: 320px;
+  text-align: center;
+  font-size: clamp(13px, 1.8dvh, 15px);
   font-weight: 500;
-  color: var(--neutral-600);
+  color: var(--game-black);
+  line-height: 1.45;
+  margin: 10px 0;
 }
 
-.hp-bar-row {
+.sim-scan-btn {
+  margin-top: 6px;
+}
+.pill-chip {
+  background: rgba(32, 32, 32, 0.9);
+  color: var(--game-white);
+  border: 2px solid var(--game-yellow);
+  border-radius: 9999px;
+  padding: 6px 16px;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   5. In-Game Combat HUD (Portrat UI - Game Controls)
+   ========================================================================== */
+#screen-combat {
+  background: transparent;
+}
+
+/* Top Enemy Bar */
+.combat-enemy-header {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 30;
+}
+.enemy-avatar-cluster {
   display: flex;
   align-items: center;
-  gap: clamp(6px, 1.1dvh, 12px);
-  margin-top: 2px;
+  gap: 12px;
 }
-
-.hp-number {
-  font-size: clamp(11px, 1.66dvh, 18px);
+.enemy-avatar-ring {
+  width: clamp(54px, 14vw, 68px);
+  height: clamp(54px, 14vw, 68px);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.enemy-avatar-pic {
+  width: 78%;
+  height: 78%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #1a1a1a;
+}
+.enemy-meta {
+  display: flex;
+  flex-direction: column;
+}
+.enemy-id-label {
+  font-size: clamp(14px, 2dvh, 17px);
   font-weight: 700;
-  color: var(--game-black);
+  color: var(--game-white);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+.enemy-name-label {
+  font-size: clamp(11px, 1.5dvh, 13px);
+  font-weight: 500;
+  color: var(--neutral-300);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.combat-sync-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(32, 32, 32, 0.75);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  color: var(--game-white);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.hp-track {
-  width: clamp(80px, 16dvh, 180px);
-  height: clamp(7px, 1.11dvh, 12px);
-  background: var(--neutral-400);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.hp-fill {
-  height: 100%;
-  background: var(--hp-green);
-  border-radius: 9999px;
-  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Turn Notification Pill (subtle) */
-.turn-announcement {
-  display: none; /* Kept clean matching Figma In game UI.png */
-}
-
-/* Bottom Left Diagonally Staggered Action Buttons */
-.combat-actions {
+/* Circular Segmented SVG Meters */
+.segmented-meter-svg {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  transform: rotate(-90deg);
   pointer-events: none;
 }
+.meter-base {
+  fill: none;
+  stroke: rgba(200, 200, 200, 0.35);
+  stroke-width: 6;
+  stroke-dasharray: 10 3;
+}
+.meter-fill {
+  fill: none;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 276;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.3s ease;
+}
+.meter-fill.green-meter {
+  stroke: var(--hp-green);
+}
 
-.combat-btn {
+/* Floating Dynamic Combat Alert Banner */
+.combat-alert-wrap {
+  position: absolute;
+  top: clamp(40%, 46dvh, 52%);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.combat-alert-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 24px;
+  border-radius: 9999px;
+  background: var(--game-white);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s ease;
+}
+.combat-alert-box.your-turn {
+  border: 3px solid var(--game-blue);
+}
+.combat-alert-box.your-turn .alert-icon {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: #EBEBEC;
-  font-family: var(--font-family);
-  font-size: clamp(15px, 3.15dvh, 34px);
+  background: var(--game-blue);
+  color: var(--game-white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.combat-alert-box.incoming {
+  border: 3px solid var(--game-red);
+}
+.combat-alert-box.incoming .alert-icon {
+  color: var(--game-red);
+  font-size: 22px;
+}
+
+.combat-alert-box.damage-dealt {
+  border: 3px solid var(--game-yellow);
+}
+.combat-alert-box.damage-taken {
+  border: 3px solid var(--game-red);
+}
+.combat-alert-box.neutralized {
+  border: 3px solid var(--game-yellow);
+}
+
+.alert-text {
+  font-size: clamp(16px, 2.4dvh, 20px);
   font-weight: 700;
   color: var(--game-black);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+/* Bottom Combat Controls Cluster */
+.combat-controls-cluster {
   position: absolute;
-  outline: none;
-  pointer-events: auto;
-}
-.combat-btn:hover {
-  transform: scale(1.06);
-}
-.combat-btn:active {
-  transform: scale(0.96);
-}
-
-/* Attack: higher & left */
-.combat-btn.attack-btn {
-  bottom: 22.96dvh;
-  left: calc(var(--sidebar-w) + 5.55dvh + env(safe-area-inset-left));
-  width: clamp(80px, 22.13dvh, 239px);
-  height: clamp(80px, 22.13dvh, 239px);
-  border: max(4px, 1.11dvh) solid var(--game-blue);
-}
-
-/* Ultimate: lower & right */
-.combat-btn.ultimate-btn {
-  bottom: 3.33dvh;
-  left: calc(var(--sidebar-w) + 25.83dvh + env(safe-area-inset-left));
-  width: clamp(80px, 22.13dvh, 239px);
-  height: clamp(80px, 22.13dvh, 239px);
-  border: max(4px, 1.11dvh) solid var(--game-yellow);
-}
-
-.combat-btn.disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-/* Bottom Right Reserve Squad (Frame 30) */
-.reserve-squad {
-  position: absolute;
-  bottom: max(16px, 3.33dvh);
-  right: max(16px, 2.5vw, env(safe-area-inset-right));
+  bottom: clamp(10px, 1.8dvh, 18px);
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(6px, 1.3dvh, 16px);
-  pointer-events: auto;
+  gap: clamp(10px, 1.8dvh, 16px);
+  z-index: 30;
 }
 
-.reserve-hero-slot {
-  border-radius: 50%;
-  background: var(--neutral-200);
+.combat-heroes-row {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  gap: clamp(12px, 3.5vw, 24px);
+  width: 100%;
+}
+
+.reserve-slot-container {
+  width: clamp(56px, 15vw, 72px);
+  height: clamp(56px, 15vw, 72px);
   cursor: pointer;
-  transition: transform 0.2s ease;
-  overflow: hidden;
+  transition: transform 0.15s ease;
 }
-.reserve-hero-slot:hover {
-  transform: scale(1.12);
+.reserve-slot-container:active {
+  transform: scale(0.92);
 }
-
-/* Distinct stack sizes and rings matching Figma */
-.reserve-hero-slot:nth-child(1) {
-  width: clamp(34px, 7.1dvh, 77px);
-  height: clamp(34px, 7.1dvh, 77px);
-  border: max(2px, 0.45dvh) solid var(--game-yellow);
-}
-.reserve-hero-slot:nth-child(2) {
-  width: clamp(38px, 8.2dvh, 89px);
-  height: clamp(38px, 8.2dvh, 89px);
-  border: max(2px, 0.45dvh) solid var(--game-red);
-}
-.reserve-hero-slot:nth-child(3) {
-  width: clamp(50px, 10.5dvh, 114px);
-  height: clamp(50px, 10.5dvh, 114px);
-  border: max(3px, 0.55dvh) solid var(--game-blue);
-}
-
-.reserve-hero-slot.yellow-ring { border-color: var(--game-yellow) !important; }
-.reserve-hero-slot.red-ring    { border-color: var(--game-red) !important; }
-.reserve-hero-slot.blue-ring   { border-color: var(--game-blue) !important; }
-
-.reserve-hero-slot.fainted {
-  opacity: 0.3;
-  filter: grayscale(1);
-  cursor: not-allowed;
-}
-
-.reserve-avatar {
+.reserve-ring {
   width: 100%;
   height: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.reserve-avatar-pic {
+  width: 78%;
+  height: 78%;
+  border-radius: 50%;
   object-fit: cover;
+  background: #111;
 }
 
-/* ==========================================================================
-   Tactical Intercept Modal
-   ========================================================================== */
+/* Active Vanguard Hero (Attack Button) */
+.active-vanguard-btn {
+  width: clamp(84px, 22vw, 106px);
+  height: clamp(84px, 22vw, 106px);
+  border-radius: 50%;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: none;
+  transition: transform 0.15s ease;
+}
+.active-vanguard-btn:active {
+  transform: scale(0.94);
+}
+.vanguard-outer-halo {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid var(--game-blue);
+  box-shadow: 0 0 16px rgba(0, 89, 255, 0.6);
+}
+.vanguard-ring {
+  width: 90%;
+  height: 90%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.vanguard-avatar-pic {
+  width: 76%;
+  height: 76%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #111;
+}
+
+/* Ultimate Strike Button */
+.combat-ultimate-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.ultimate-pill-btn {
+  width: min(84vw, 360px);
+  height: clamp(44px, 5.8dvh, 52px);
+  border-radius: 9999px;
+  font-family: var(--font-family);
+  font-size: clamp(16px, 2.2dvh, 18px);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: none;
+  transition: all 0.25s ease;
+}
+.ultimate-pill-btn.off {
+  background: var(--neutral-300);
+  border: 3px solid var(--game-yellow);
+  color: var(--neutral-600);
+  cursor: not-allowed;
+}
+.ultimate-pill-btn.on {
+  background: var(--game-yellow);
+  border: 3px solid var(--game-yellow);
+  color: var(--game-white);
+  box-shadow: 0 0 24px rgba(255, 217, 0, 0.75);
+  animation: ultGlow 1.2s infinite alternate ease-in-out;
+}
+@keyframes ultGlow {
+  0% { transform: scale(1); box-shadow: 0 0 18px rgba(255, 217, 0, 0.6); }
+  100% { transform: scale(1.03); box-shadow: 0 0 32px rgba(255, 217, 0, 0.95); }
+}
+
+/* Intercept Reaction Modal */
 .modal-backdrop {
   position: absolute;
   top: 0;
@@ -753,352 +1058,180 @@ html, body {
   height: 100%;
   background: rgba(0, 0, 0, 0.75);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 100;
-  pointer-events: auto;
 }
-
 .intercept-card {
-  background: var(--game-white);
-  padding: clamp(16px, 3.5dvh, 40px);
-  border-radius: clamp(16px, 3dvh, 32px);
-  max-width: min(600px, 80vw);
-  width: 90%;
+  background: var(--game-black);
+  border: 3px solid var(--game-red);
+  border-radius: 20px;
+  padding: 24px;
+  width: 88%;
+  max-width: 360px;
   text-align: center;
-  border: var(--btn-border) solid var(--game-black);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(12px, 2.2dvh, 24px);
+  color: var(--game-white);
 }
-
 .intercept-title {
-  font-size: clamp(20px, 3.3dvh, 36px);
-  font-weight: 900;
+  font-size: 20px;
+  font-weight: 700;
   color: var(--game-red);
+  margin-bottom: 8px;
 }
-
 .intercept-desc {
-  font-size: clamp(12px, 1.85dvh, 20px);
-  color: var(--game-black);
-  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 18px;
+  color: var(--neutral-300);
 }
-
 .intercept-actions {
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.5dvh, 16px);
-}
-
-.swap-options {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: clamp(8px, 1.5dvh, 16px);
-  margin-top: 4px;
+  gap: 10px;
 }
 
 /* ==========================================================================
-   Pause Screen Overlay (Pause Menu.png)
+   6. Settings Screen (Portrat UI - Server-1)
    ========================================================================== */
-.pause-screen {
-  background: var(--game-black) !important;
-  z-index: 150;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+#screen-settings {
+  background: var(--game-white);
+}
+.settings-screen-content {
+  width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: clamp(16px, 2.5dvh, 24px);
+  padding: 24px;
 }
-
-.pause-close-btn {
-  position: absolute;
-  top: max(16px, 7.7dvh);
-  left: max(16px, 4.5dvh, env(safe-area-inset-left));
-  background: transparent;
-  border: none;
+.settings-home-pill-btn {
+  width: 100%;
+  max-width: 340px;
+  height: clamp(48px, 6dvh, 56px);
+  border-radius: 9999px;
+  background: var(--game-blue);
   color: var(--game-white);
-  font-size: clamp(24px, 4.5dvh, 48px);
-  font-weight: 300;
+  font-family: var(--font-family);
+  font-size: clamp(16px, 2.2dvh, 18px);
+  font-weight: 700;
+  border: 3px solid #000000;
   cursor: pointer;
   outline: none;
-  transition: transform 0.2s;
-  z-index: 160;
-}
-.pause-close-btn:hover {
-  transform: scale(1.15);
 }
 
-/* ==========================================================================
-   WebAR Video Feed & Transparent Overlays
-   ========================================================================== */
-body.ar-active,
-body.ar-active #app,
-body.ar-active #three-container,
-body.ar-active #ui-stage,
-body.ar-active #screen-combat {
-  background: transparent !important;
-  background-color: transparent !important;
-}
-
-#three-container video {
-  position: absolute !important;
-  z-index: 0 !important;
-  /* MindAR internally calculates exact top/left/width/height to align projection with screen */
-}
-
-#three-container canvas {
-  position: absolute !important;
-  z-index: 2 !important;
-  background: transparent !important;
-}
-
-/* ==========================================================================
-   Card Scanning Screen (Card Scan.png & Card Scan 2.png)
-   ========================================================================== */
-#screen-card-scan {
-  position: absolute;
-  top: 0;
-  left: 0;
+.settings-pill-row {
   width: 100%;
-  height: 100%;
-  display: none;
-  flex-direction: column;
+  max-width: 340px;
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: clamp(14px, 3.2dvh, 36px) clamp(16px, 2.5vw, 40px);
-  background: transparent !important;
-  overflow: hidden;
-  z-index: 30;
-  pointer-events: auto;
+  gap: 12px;
 }
-
-#screen-card-scan.active {
-  display: flex !important;
-}
-
-.scan-title {
-  font-size: clamp(22px, 4.44dvh, 48px);
+.settings-tag-pill {
+  width: clamp(100px, 30vw, 130px);
+  height: clamp(44px, 5.5dvh, 50px);
+  border-radius: 9999px;
+  border: 2.5px solid var(--game-blue);
+  background: var(--game-white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--game-black);
-  text-align: center;
-  z-index: 5;
-  margin-top: clamp(4px, 1dvh, 12px);
-}
-
-.scan-viewport-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  width: 100%;
-  min-height: 0;
-}
-
-.scan-window {
-  position: relative;
-  width: clamp(260px, 67.7dvh, 731px);
-  height: clamp(220px, 60dvh, 665px);
-  border-radius: clamp(18px, 3.2dvh, 36px);
-  box-shadow: 0 0 0 9999px #FFFFFF;
-  border: max(4px, 0.74dvh) solid transparent;
-  background: transparent;
-  z-index: 2;
-  transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-}
-
-.scan-window.scanned {
-  border-color: #44FF00 !important;
-  box-shadow: 0 0 0 9999px #FFFFFF, 0 0 25px rgba(68, 255, 0, 0.4);
-}
-
-.scan-btn-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(16px, 3.33dvh, 36px);
-  width: 100%;
-  max-width: min(731px, 70dvh);
-  z-index: 5;
-  margin-bottom: clamp(6px, 1.5dvh, 16px);
-}
-
-.scan-btn-row .figma-btn {
-  flex: 1;
-  width: auto;
-  max-width: 320px;
-}
-
-/* ==========================================================================
-   Holographic AR Card Scanning Reticle Overlay
-   ========================================================================== */
-.ar-scanning-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: clamp(10px, 2dvh, 20px);
-  z-index: 40;
-  pointer-events: none;
-}
-
-.ar-scanning-overlay.hidden {
-  display: none !important;
-}
-
-.reticle-box {
-  position: relative;
-  width: clamp(140px, 25dvh, 260px);
-  height: clamp(200px, 36dvh, 380px);
-  border: 2px dashed rgba(0, 89, 255, 0.6);
-  border-radius: 16px;
-  box-shadow: 0 0 35px rgba(0, 89, 255, 0.3);
-  pointer-events: none;
-}
-
-.reticle-corner {
-  position: absolute;
-  width: clamp(18px, 3dvh, 28px);
-  height: clamp(18px, 3dvh, 28px);
-  border-color: var(--game-yellow);
-  border-style: solid;
-}
-.reticle-corner.top-left     { top: -3px; left: -3px; border-width: 4px 0 0 4px; border-radius: 6px 0 0 0; }
-.reticle-corner.top-right    { top: -3px; right: -3px; border-width: 4px 4px 0 0; border-radius: 0 6px 0 0; }
-.reticle-corner.bottom-left  { bottom: -3px; left: -3px; border-width: 0 0 4px 4px; border-radius: 0 0 0 6px; }
-.reticle-corner.bottom-right { bottom: -3px; right: -3px; border-width: 0 4px 4px 0; border-radius: 0 0 6px 0; }
-
-.scan-laser {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--game-blue), var(--game-yellow), var(--game-blue), transparent);
-  box-shadow: 0 0 14px var(--game-blue);
-  animation: scanLaserMove 2s infinite ease-in-out;
-}
-
-@keyframes scanLaserMove {
-  0%   { top: 0%; opacity: 0.3; }
-  50%  { top: 97%; opacity: 1; }
-  100% { top: 0%; opacity: 0.3; }
-}
-
-.scan-info-bubble {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(6px, 1.2dvh, 12px);
-  pointer-events: auto;
-}
-
-.scanning-prompt {
-  font-size: clamp(12px, 1.85dvh, 20px);
-  font-weight: 700;
-  color: var(--game-white);
-  background: rgba(32, 32, 32, 0.88);
-  backdrop-filter: blur(8px);
-  padding: clamp(6px, 1dvh, 10px) clamp(16px, 2.4dvh, 26px);
-  border-radius: 100px;
-  border: 2px solid var(--game-blue);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
-  text-align: center;
-}
-.scanning-prompt span {
-  color: var(--game-yellow);
-}
-
-.pill-chip {
-  background: rgba(32, 32, 32, 0.88);
-  color: var(--game-white);
-  border: 2px solid var(--game-blue);
-  border-radius: 100px;
-  padding: clamp(4px, 0.8dvh, 8px) clamp(12px, 1.6dvh, 18px);
-  font-family: var(--font-family);
-  font-size: clamp(11px, 1.4dvh, 14px);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.pill-chip.secondary {
-  border-color: var(--game-yellow);
-}
-.pill-chip.secondary:hover {
-  background: var(--game-yellow);
   color: #000000;
 }
+.settings-val-pill {
+  flex: 1;
+  height: clamp(44px, 5.5dvh, 50px);
+  border-radius: 9999px;
+  background: var(--game-blue);
+  color: var(--game-white);
+  font-family: var(--font-family);
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  border: none;
+  outline: none;
+}
+.settings-val-pill.toggleable {
+  max-width: 80px;
+  cursor: pointer;
+}
+
+.settings-exit-pill-btn {
+  width: 100%;
+  max-width: 340px;
+  height: clamp(48px, 6dvh, 56px);
+  border-radius: 9999px;
+  background: var(--game-red);
+  color: var(--game-white);
+  font-family: var(--font-family);
+  font-size: clamp(16px, 2.2dvh, 18px);
+  font-weight: 700;
+  border: 3px solid #000000;
+  cursor: pointer;
+  outline: none;
+  margin-top: 8px;
+}
+.settings-exit-pill-btn:active {
+  transform: scale(0.97);
+}
 
 /* ==========================================================================
-   Landscape-Only Enforcement Overlay
+   Bottom Navigation Bar (Figma Nav Bar)
    ========================================================================== */
-@media (orientation: portrait) {
-  #rotate-prompt {
-    display: flex !important;
-  }
-}
-@media (orientation: landscape) {
-  #rotate-prompt {
-    display: none !important;
-  }
+.bottom-nav-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-h);
+  background: var(--game-black);
+  z-index: 60;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
 }
 
-.rotate-prompt-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  background: #111216;
-  z-index: 99999;
-  display: none;
-  flex-direction: column;
+.nav-tab-btn {
+  flex: 1;
+  height: 100%;
+  background: none;
+  border: none;
+  display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
-  padding: 30px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+
+.nav-active-pill {
+  position: absolute;
+  width: clamp(72px, 24vw, 104px);
+  height: clamp(38px, 4.8dvh, 46px);
+  background: var(--game-blue);
+  border-radius: 9999px;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.nav-tab-btn.active .nav-active-pill {
+  opacity: 1;
+}
+
+.nav-tab-icon {
+  position: relative;
+  z-index: 2;
   color: var(--game-white);
 }
-
-.rotate-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  max-width: 420px;
+.nav-logo-icon {
+  height: clamp(24px, 3.2dvh, 32px);
+  width: auto;
 }
-
-.rotate-phone-icon {
-  font-size: 72px;
-  animation: rotatePhoneAnim 2s infinite ease-in-out;
-}
-
-@keyframes rotatePhoneAnim {
-  0%   { transform: rotate(0deg); }
-  50%  { transform: rotate(-90deg); }
-  100% { transform: rotate(0deg); }
-}
-
-.rotate-title {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--game-yellow);
-}
-
-.rotate-desc {
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--neutral-300);
+.nav-svg-icon {
+  width: clamp(24px, 3.2dvh, 30px);
+  height: clamp(24px, 3.2dvh, 30px);
 }

@@ -1,4 +1,4 @@
-// Screen Navigation & UI Component Controller
+// Screen Navigation & Portrait UI Component Controller
 import { HEROES_LIST } from '../combat/HeroData.js';
 
 export class UIManager {
@@ -14,85 +14,105 @@ export class UIManager {
     this.onScanPlay = options.onScanPlay || (() => {});
     this.onExitGame = options.onExitGame || (() => {});
 
-    this.selectedHeroes = []; // Array of up to 3 hero IDs
-    this.inspectedHero = HEROES_LIST[0];
+    this.selectedHeroes = []; // Up to 3 hero IDs
+    this.carouselIndex = 0;
     this.mode = 'AI'; // 'AI' | 'MULTIPLAYER'
     this.isCardScanned = false;
+    this.soundLevel = 10;
+    this.currentScreen = 'home';
 
     this.cacheDom();
     this.bindEvents();
-    this.renderHeroGrid();
-    this.updateHeroDrawer(this.inspectedHero, false);
+    this.renderCarousel();
+    this.updateDraftTray();
   }
 
   cacheDom() {
     // Screens
     this.screens = {
-      landing: document.getElementById('screen-landing'),
-      join: document.getElementById('screen-join'),
-      username: document.getElementById('screen-username'),
+      home: document.getElementById('screen-home'),
+      server: document.getElementById('screen-server'),
       heroSelect: document.getElementById('screen-hero-select'),
       cardScan: document.getElementById('screen-card-scan'),
       combat: document.getElementById('screen-combat'),
-      pause: document.getElementById('screen-pause')
+      settings: document.getElementById('screen-settings')
     };
 
-    // Sidebar
-    this.sidebarLogo = document.getElementById('sidebar-logo');
-    this.sidebarHamburger = document.getElementById('sidebar-hamburger');
-    this.sidebarClose = document.getElementById('sidebar-close');
-    this.sidebarSettings = document.getElementById('sidebar-settings');
+    // Header
+    this.btnFullscreenToggle = document.getElementById('btn-fullscreen-toggle');
+    this.fullscreenIcon = document.getElementById('fullscreen-icon');
+    this.subheaderWrap = document.getElementById('subheader-wrap');
+    this.btnSubheaderBack = document.getElementById('btn-subheader-back');
+    this.subheaderTitle = document.getElementById('subheader-title');
+    this.headerUserId = document.getElementById('header-user-id');
+    this.headerAvatarBtn = document.getElementById('header-avatar-btn');
 
-    // Landing Buttons
-    this.btnPlayLanding = document.getElementById('btn-play-landing');
-    this.btnJoinLanding = document.getElementById('btn-join-landing');
-    this.btnExitLanding = document.getElementById('btn-exit-landing');
+    // Bottom Navigation
+    this.bottomNav = document.getElementById('bottom-nav');
+    this.navTabs = {
+      home: document.getElementById('nav-tab-home'),
+      server: document.getElementById('nav-tab-server'),
+      settings: document.getElementById('nav-tab-settings')
+    };
 
-    // Join Room Inputs & Buttons
+    // Home Screen
+    this.btnPlayHome = document.getElementById('btn-play-home');
+
+    // Server Screen
     this.inputRoomCode = document.getElementById('input-room-code');
-    this.btnJoinCancel = document.getElementById('btn-join-cancel');
-    this.btnJoinSubmit = document.getElementById('btn-join-submit');
-
-    // Username Inputs & Buttons
-    this.roomJoinedTitle = document.getElementById('room-joined-title');
-    this.inputUsername = document.getElementById('input-username');
-    this.btnUserCancel = document.getElementById('btn-user-cancel');
-    this.btnUserPlay = document.getElementById('btn-user-play');
+    this.btnJoinRoom = document.getElementById('btn-join-room');
+    this.displayRoomCode = document.getElementById('display-room-code');
+    this.btnCreateRoom = document.getElementById('btn-create-room');
 
     // Hero Selection
-    this.heroSelectionTitle = document.getElementById('hero-selection-title');
-    this.heroGrid = document.getElementById('hero-grid');
+    this.heroCarouselTrack = document.getElementById('hero-carousel-track');
+    this.btnCarouselPrev = document.getElementById('btn-carousel-prev');
+    this.btnCarouselNext = document.getElementById('btn-carousel-next');
+    this.heroDraftTray = document.getElementById('hero-draft-tray');
+    this.draftSlots = [
+      document.getElementById('draft-slot-0'),
+      document.getElementById('draft-slot-1'),
+      document.getElementById('draft-slot-2')
+    ];
     this.btnHeroContinue = document.getElementById('btn-hero-continue');
-    this.heroDrawer = document.getElementById('hero-drawer');
-    this.drawerAvatar = document.getElementById('drawer-avatar');
-    this.drawerHeroName = document.getElementById('drawer-hero-name');
-    this.drawerCategory = document.getElementById('drawer-category');
-    this.drawerHpVal = document.getElementById('drawer-hp-val');
-    this.drawerHpBar = document.getElementById('drawer-hp-bar');
-    this.drawerAtkVal = document.getElementById('drawer-atk-val');
-    this.drawerAtkBar = document.getElementById('drawer-atk-bar');
-    this.drawerUltDesc = document.getElementById('drawer-ult-desc');
+
+    // Card Scan
+    this.scanViewportWindow = document.getElementById('scan-viewport-window');
+    this.scanStatusBadge = document.getElementById('scan-status-badge');
+    this.btnScanContinue = document.getElementById('btn-scan-continue');
+    this.btnManualSimScan = document.getElementById('btn-manual-sim-scan');
 
     // Combat HUD
-    this.hudP1Avatar = document.getElementById('hud-p1-avatar');
-    this.hudP1Username = document.getElementById('hud-p1-username');
-    this.hudP1HeroName = document.getElementById('hud-p1-hero-name');
-    this.hudP1Hp = document.getElementById('hud-p1-hp');
-    this.hudP1HpBar = document.getElementById('hud-p1-hp-bar');
+    this.enemyAvatarImg = document.getElementById('enemy-avatar-img');
+    this.enemyUserId = document.getElementById('enemy-user-id');
+    this.enemyHeroName = document.getElementById('enemy-hero-name');
+    this.enemyHpRing = document.getElementById('enemy-hp-ring');
+    this.btnCombatSync = document.getElementById('btn-combat-sync');
 
-    this.hudP2Avatar = document.getElementById('hud-p2-avatar');
-    this.hudP2Username = document.getElementById('hud-p2-username');
-    this.hudP2HeroName = document.getElementById('hud-p2-hero-name');
-    this.hudP2Hp = document.getElementById('hud-p2-hp');
-    this.hudP2HpBar = document.getElementById('hud-p2-hp-bar');
+    this.combatAlertWrap = document.getElementById('combat-alert-wrap');
+    this.combatAlertBox = document.getElementById('combat-alert-box');
+    this.alertIcon = document.getElementById('alert-icon');
+    this.alertText = document.getElementById('alert-text');
 
-    this.turnAnnouncement = document.getElementById('turn-announcement');
-    this.turnBannerText = document.getElementById('turn-banner-text');
+    this.btnActiveAttack = document.getElementById('btn-active-attack');
+    this.playerAvatarImg = document.getElementById('player-avatar-img');
+    this.playerHpRing = document.getElementById('player-hp-ring');
 
-    this.btnAttack = document.getElementById('btn-attack');
-    this.btnUltimate = document.getElementById('btn-ultimate');
-    this.ultMeterIndicator = document.getElementById('ult-meter-indicator');
-    this.reserveSquad = document.getElementById('reserve-squad');
+    this.reserveSlots = [
+      document.getElementById('reserve-slot-0'),
+      document.getElementById('reserve-slot-1')
+    ];
+    this.reserveImgs = [
+      document.getElementById('reserve-0-img'),
+      document.getElementById('reserve-1-img')
+    ];
+    this.reserveHpRings = [
+      document.getElementById('reserve-0-hp-ring'),
+      document.getElementById('reserve-1-hp-ring')
+    ];
+
+    this.btnCombatUltimate = document.getElementById('btn-combat-ultimate');
+    this.ultimateBtnLabel = document.getElementById('ultimate-btn-label');
 
     // Intercept Modal
     this.interceptModal = document.getElementById('intercept-modal');
@@ -100,121 +120,144 @@ export class UIManager {
     this.btnHoldGround = document.getElementById('btn-hold-ground');
     this.swapOptions = document.getElementById('swap-options');
 
-    // Pause Buttons
-    this.btnPauseResume = document.getElementById('btn-pause-resume');
-    this.btnPauseSettings = document.getElementById('btn-pause-settings');
-    this.btnPauseExit = document.getElementById('btn-pause-exit');
-    this.btnPauseScreenClose = document.getElementById('btn-pause-screen-close');
-
-    // Card Scan Screen Elements
-    this.scanTitle = document.getElementById('scan-title');
-    this.scanWindow = document.getElementById('scan-window');
-    this.btnScanCancel = document.getElementById('btn-scan-cancel');
-    this.btnScanAction = document.getElementById('btn-scan-action');
-
-    // AR Scanning Overlay
-    this.arScanningOverlay = document.getElementById('ar-scanning-overlay');
-    this.scanningHeroName = document.getElementById('scanning-hero-name');
-    this.btnManualSimScan = document.getElementById('btn-manual-sim-scan');
-
-    // Fullscreen buttons
-    this.btnFullscreenToggle = document.getElementById('btn-fullscreen-toggle');
-    this.btnForceFullscreen = document.getElementById('btn-force-fullscreen');
-
-    this.btnDetectCardSim = document.getElementById('btn-detect-card-sim');
+    // Settings Screen
+    this.btnSettingsHome = document.getElementById('btn-settings-home');
+    this.inputSettingsUser = document.getElementById('input-settings-user');
+    this.btnSettingsSound = document.getElementById('btn-settings-sound');
+    this.btnSettingsExit = document.getElementById('btn-settings-exit');
   }
 
   bindEvents() {
-    // Landing
-    this.btnPlayLanding.addEventListener('click', () => {
-      this.mode = 'AI';
-      this.switchScreen('heroSelect');
-    });
-
-    this.btnJoinLanding.addEventListener('click', () => {
-      this.mode = 'MULTIPLAYER';
-      this.switchScreen('join');
-    });
-
-    this.btnExitLanding.addEventListener('click', () => {
-      this.onExitGame();
-      alert('Game closed.');
-    });
-
-    // Join Room
-    this.btnJoinCancel.addEventListener('click', () => this.switchScreen('landing'));
-    this.btnJoinSubmit.addEventListener('click', () => {
-      const code = this.inputRoomCode.value.trim() || '3031';
-      this.roomJoinedTitle.textContent = `Room #${code} joined!`;
-      this.switchScreen('username');
-    });
-
-    // Username
-    this.btnUserCancel.addEventListener('click', () => this.switchScreen('join'));
-    this.btnUserPlay.addEventListener('click', () => {
-      this.hudP1Username.textContent = this.inputUsername.value.trim() || 'User567';
-      this.switchScreen('heroSelect');
-    });
-
-    // Hero Continue -> Transitions to Card Scan (Card Scan.png)
-    this.btnHeroContinue.addEventListener('click', () => {
-      if (this.selectedHeroes.length === 3) {
-        this.setScanState(false);
-        this.switchScreen('cardScan');
-        this.onStartGame(this.selectedHeroes);
+    // Navigation Tabs
+    Object.entries(this.navTabs).forEach(([key, tabEl]) => {
+      if (tabEl) {
+        tabEl.addEventListener('click', () => {
+          if (key === 'home') this.switchScreen('home');
+          else if (key === 'server') this.switchScreen('server');
+          else if (key === 'settings') this.switchScreen('settings');
+        });
       }
     });
 
-    // Card Scan Actions
-    if (this.btnScanCancel) {
-      this.btnScanCancel.addEventListener('click', () => {
-        this.onScanCancel();
+    // Subheader Back Button
+    if (this.btnSubheaderBack) {
+      this.btnSubheaderBack.addEventListener('click', () => {
+        if (this.currentScreen === 'heroSelect') {
+          this.switchScreen('home');
+        } else if (this.currentScreen === 'cardScan') {
+          this.onScanCancel();
+          this.switchScreen('heroSelect');
+        } else if (this.currentScreen === 'combat') {
+          this.switchScreen('settings');
+        }
+      });
+    }
+
+    // Home Screen Actions
+    if (this.btnPlayHome) {
+      this.btnPlayHome.addEventListener('click', () => {
+        this.mode = 'AI';
         this.switchScreen('heroSelect');
       });
     }
 
-    if (this.btnScanAction) {
-      this.btnScanAction.addEventListener('click', () => {
+    // Server Screen Actions
+    if (this.btnJoinRoom) {
+      this.btnJoinRoom.addEventListener('click', () => {
+        const code = this.inputRoomCode.value.trim() || '4879';
+        this.mode = 'MULTIPLAYER';
+        this.switchScreen('heroSelect');
+      });
+    }
+    if (this.btnCreateRoom) {
+      this.btnCreateRoom.addEventListener('click', () => {
+        this.mode = 'MULTIPLAYER';
+        this.switchScreen('heroSelect');
+      });
+    }
+
+    // Hero Carousel Arrows
+    if (this.btnCarouselPrev) {
+      this.btnCarouselPrev.addEventListener('click', () => this.navigateCarousel(-1));
+    }
+    if (this.btnCarouselNext) {
+      this.btnCarouselNext.addEventListener('click', () => this.navigateCarousel(1));
+    }
+
+    // Continue to Card Scan
+    if (this.btnHeroContinue) {
+      this.btnHeroContinue.addEventListener('click', () => {
+        if (this.selectedHeroes.length === 3) {
+          this.setScanState(false);
+          this.switchScreen('cardScan');
+          this.onStartGame(this.selectedHeroes);
+        }
+      });
+    }
+
+    // Card Scan Screen Actions
+    if (this.btnScanContinue) {
+      this.btnScanContinue.addEventListener('click', () => {
         if (this.isCardScanned) {
           this.switchScreen('combat');
           this.onScanPlay();
         }
       });
     }
-
-    // Sidebar actions
-    this.sidebarHamburger.addEventListener('click', () => {
-      this.openPauseMenu();
-    });
-
-    this.sidebarClose.addEventListener('click', () => {
-      this.closePauseMenu();
-    });
-
-    if (this.btnPauseScreenClose) {
-      this.btnPauseScreenClose.addEventListener('click', () => {
-        this.closePauseMenu();
+    if (this.btnManualSimScan) {
+      this.btnManualSimScan.addEventListener('click', () => {
+        this.onSimulateCard();
       });
     }
 
-    // Pause Menu
-    this.btnPauseResume.addEventListener('click', () => this.closePauseMenu());
-    this.btnPauseSettings.addEventListener('click', () => alert('Audio: 100% | Bloom: ON | Quality: HIGH'));
-    this.btnPauseExit.addEventListener('click', () => {
-      this.closePauseMenu();
-      this.onExitGame();
-      this.switchScreen('landing');
-    });
+    // Combat HUD Actions
+    if (this.btnActiveAttack) {
+      this.btnActiveAttack.addEventListener('click', () => {
+        this.onAttackClick();
+      });
+    }
+    if (this.btnCombatUltimate) {
+      this.btnCombatUltimate.addEventListener('click', () => {
+        if (this.btnCombatUltimate.classList.contains('on')) {
+          this.onUltimateClick();
+        }
+      });
+    }
+    if (this.btnHoldGround) {
+      this.btnHoldGround.addEventListener('click', () => {
+        this.hideInterceptModal();
+        this.onInterceptChoice('hold');
+      });
+    }
 
-    // Combat Action Buttons
-    this.btnAttack.addEventListener('click', () => this.onAttackClick());
-    this.btnUltimate.addEventListener('click', () => this.onUltimateClick());
-    this.btnHoldGround.addEventListener('click', () => {
-      this.hideInterceptModal();
-      this.onInterceptChoice('hold');
-    });
+    // Settings Screen Actions
+    if (this.btnSettingsHome) {
+      this.btnSettingsHome.addEventListener('click', () => {
+        this.switchScreen('home');
+      });
+    }
+    if (this.inputSettingsUser) {
+      this.inputSettingsUser.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (val && this.headerUserId) {
+          this.headerUserId.textContent = `UserId${val}`;
+        }
+      });
+    }
+    if (this.btnSettingsSound) {
+      this.btnSettingsSound.addEventListener('click', () => {
+        this.soundLevel = (this.soundLevel + 2) % 12;
+        this.btnSettingsSound.textContent = this.soundLevel.toString();
+      });
+    }
+    if (this.btnSettingsExit) {
+      this.btnSettingsExit.addEventListener('click', () => {
+        this.onExitGame();
+        this.switchScreen('home');
+      });
+    }
 
-    // Synchronous, vendor-prefixed Fullscreen toggle for mobile browsers
+    // Fullscreen Toggle
     const toggleFs = (e) => {
       if (e && e.cancelable) e.preventDefault();
       try {
@@ -224,22 +267,18 @@ export class UIManager {
 
         if (!isFs) {
           const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
-          if (req) {
-            const p = req.call(docEl);
-            if (p && p.catch) p.catch(() => {});
-          }
+          if (req) req.call(docEl).catch(() => {});
           if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('landscape').catch(() => {});
+            screen.orientation.lock('portrait').catch(() => {});
           }
+          if (this.fullscreenIcon) this.fullscreenIcon.src = '/assets/ui/close-fullscreen.png';
         } else {
           const exit = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
-          if (exit) {
-            const p = exit.call(doc);
-            if (p && p.catch) p.catch(() => {});
-          }
+          if (exit) exit.call(doc).catch(() => {});
+          if (this.fullscreenIcon) this.fullscreenIcon.src = '/assets/ui/open-fullscreen.png';
         }
       } catch (err) {
-        console.log('Fullscreen error:', err);
+        console.warn('Fullscreen toggle:', err);
       }
     };
 
@@ -247,79 +286,111 @@ export class UIManager {
       this.btnFullscreenToggle.addEventListener('click', toggleFs);
       this.btnFullscreenToggle.addEventListener('touchend', toggleFs);
     }
-    if (this.btnForceFullscreen) {
-      this.btnForceFullscreen.addEventListener('click', toggleFs);
-      this.btnForceFullscreen.addEventListener('touchend', toggleFs);
-    }
-
-    if (this.btnManualSimScan) {
-      this.btnManualSimScan.addEventListener('click', () => this.onSimulateCard());
-    }
-
-    if (this.btnToggleArMode) {
-      this.btnToggleArMode.addEventListener('click', () => this.onModeToggle());
-    }
-    if (this.btnDetectCardSim) {
-      this.btnDetectCardSim.addEventListener('click', () => this.onSimulateCard());
-    }
   }
 
   switchScreen(screenKey) {
-    Object.values(this.screens).forEach(s => s.classList.remove('active'));
-    if (this.screens[screenKey]) {
-      this.screens[screenKey].classList.add('active');
-    }
-
-    // Adjust Sidebar for Combat
-    if (screenKey === 'combat') {
-      this.sidebarLogo.classList.add('hidden');
-      this.sidebarHamburger.classList.remove('hidden');
-      this.sidebarClose.classList.add('hidden');
-    } else {
-      this.sidebarLogo.classList.remove('hidden');
-      this.sidebarHamburger.classList.add('hidden');
-      this.sidebarClose.classList.add('hidden');
-    }
-  }
-
-  openPauseMenu() {
-    this.screens.pause.classList.remove('hidden');
-    this.screens.pause.classList.add('active');
-    this.sidebarHamburger.classList.add('hidden');
-    this.sidebarClose.classList.remove('hidden');
-  }
-
-  closePauseMenu() {
-    this.screens.pause.classList.remove('active');
-    this.screens.pause.classList.add('hidden');
-    this.sidebarClose.classList.add('hidden');
-    this.sidebarHamburger.classList.remove('hidden');
-  }
-
-  renderHeroGrid() {
-    this.heroGrid.innerHTML = '';
-    HEROES_LIST.forEach((hero) => {
-      const slot = document.createElement('div');
-      slot.className = 'hero-card-slot';
-      slot.dataset.id = hero.id;
-
-      const img = document.createElement('img');
-      img.src = hero.icon;
-      img.alt = hero.name;
-      img.className = 'hero-slot-img';
-      slot.appendChild(img);
-
-      slot.addEventListener('click', () => {
-        this.inspectedHero = hero;
-        this.updateHeroDrawer(hero, true);
-        this.toggleHeroSelection(hero.id, slot);
-      });
-
-      this.heroGrid.appendChild(slot);
+    this.currentScreen = screenKey;
+    Object.entries(this.screens).forEach(([key, el]) => {
+      if (el) {
+        if (key === screenKey) el.classList.add('active');
+        else el.classList.remove('active');
+      }
     });
+
+    // Subheader display control
+    if (this.subheaderWrap) {
+      if (screenKey === 'heroSelect') {
+        this.subheaderWrap.classList.remove('hidden');
+        this.subheaderTitle.textContent = 'Select your hero';
+      } else if (screenKey === 'cardScan') {
+        this.subheaderWrap.classList.remove('hidden');
+        this.subheaderTitle.textContent = 'Scan your card';
+      } else {
+        this.subheaderWrap.classList.add('hidden');
+      }
+    }
+
+    // Navigation Tab Active Pill
+    Object.entries(this.navTabs).forEach(([key, tabEl]) => {
+      if (tabEl) {
+        if (key === screenKey) tabEl.classList.add('active');
+        else tabEl.classList.remove('active');
+      }
+    });
+
+    // Combat and Scan transparent background
+    if (screenKey === 'combat' || screenKey === 'cardScan') {
+      document.body.classList.add('ar-active');
+    } else {
+      if (!this.isCardScanned) {
+        document.body.classList.remove('ar-active');
+      }
+    }
   }
 
-  toggleHeroSelection(heroId, slotElement) {
+  renderCarousel() {
+    if (!this.heroCarouselTrack) return;
+    this.heroCarouselTrack.innerHTML = '';
+
+    const hero = HEROES_LIST[this.carouselIndex];
+    if (!hero) return;
+
+    const card = document.createElement('div');
+    card.className = 'hero-card-display';
+
+    if (hero.cardImage) {
+      const img = document.createElement('img');
+      img.src = hero.cardImage;
+      img.alt = hero.name;
+      img.className = 'card-img-layer';
+      card.appendChild(img);
+    } else {
+      // Dynamic Card Fallback with ArUco corners and hero styling
+      const fallback = document.createElement('div');
+      fallback.className = 'card-fallback-frame';
+      fallback.innerHTML = `
+        <div class="card-fallback-top">
+          <div>
+            <div class="card-hero-name">${hero.name}</div>
+            <div class="card-hero-class">${hero.class}</div>
+          </div>
+        </div>
+        <img class="card-fallback-avatar" src="${hero.icon}" alt="${hero.name}">
+        <div class="card-fallback-stats">
+          <div>Health: <strong>${hero.hp}hp</strong></div>
+          <div>Damage: <strong>-${hero.atk}hp</strong></div>
+          <div>Ult: ${hero.ultDesc}</div>
+        </div>
+      `;
+      card.appendChild(fallback);
+    }
+
+    // Add / Added toggle button at bottom of card
+    const actionWrap = document.createElement('div');
+    actionWrap.className = 'card-action-overlay';
+
+    const isAdded = this.selectedHeroes.includes(hero.id);
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = `btn-card-add-toggle ${isAdded ? 'added-mode' : 'add-mode'}`;
+    toggleBtn.innerHTML = isAdded ? '<span>✓ Added</span>' : '<span>+ Add Hero</span>';
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleHeroSelection(hero.id);
+    });
+
+    actionWrap.appendChild(toggleBtn);
+    card.appendChild(actionWrap);
+    this.heroCarouselTrack.appendChild(card);
+  }
+
+  navigateCarousel(dir) {
+    this.carouselIndex = (this.carouselIndex + dir + HEROES_LIST.length) % HEROES_LIST.length;
+    this.renderCarousel();
+    this.updateDraftTray();
+  }
+
+  toggleHeroSelection(heroId) {
     const idx = this.selectedHeroes.indexOf(heroId);
     if (idx > -1) {
       this.selectedHeroes.splice(idx, 1);
@@ -328,205 +399,186 @@ export class UIManager {
         this.selectedHeroes.push(heroId);
       }
     }
-    this.updateHeroGridSelections();
+    this.renderCarousel();
+    this.updateDraftTray();
   }
 
-  updateHeroGridSelections() {
-    const slots = this.heroGrid.querySelectorAll('.hero-card-slot');
-    slots.forEach(slot => {
-      const heroId = slot.dataset.id;
-      const selectIndex = this.selectedHeroes.indexOf(heroId);
+  updateDraftTray() {
+    const activeHero = HEROES_LIST[this.carouselIndex];
 
-      // Remove existing badge if any
-      const existingBadge = slot.querySelector('.hero-badge-num');
-      if (existingBadge) existingBadge.remove();
+    this.draftSlots.forEach((slot, index) => {
+      const heroId = this.selectedHeroes[index];
+      slot.innerHTML = '';
+      slot.className = 'draft-slot';
 
-      if (selectIndex > -1) {
-        slot.classList.add('selected');
-        const badge = document.createElement('div');
-        badge.className = 'hero-badge-num';
-        badge.textContent = (selectIndex + 1).toString();
-        slot.appendChild(badge);
+      if (heroId) {
+        const hero = HEROES_LIST.find(h => h.id === heroId);
+        slot.classList.add('filled');
+        const img = document.createElement('img');
+        img.src = hero ? hero.icon : '';
+        img.alt = hero ? hero.name : '';
+        slot.appendChild(img);
+
+        // Highlight with wings if currently inspected in carousel
+        if (activeHero && activeHero.id === heroId) {
+          slot.classList.add('active-wings');
+        }
+
+        slot.onclick = () => {
+          this.toggleHeroSelection(heroId);
+        };
       } else {
-        slot.classList.remove('selected');
+        slot.classList.add('empty');
+        const plus = document.createElement('span');
+        plus.className = 'slot-plus';
+        plus.textContent = '+';
+        slot.appendChild(plus);
+        slot.onclick = () => {
+          if (activeHero && !this.selectedHeroes.includes(activeHero.id)) {
+            this.toggleHeroSelection(activeHero.id);
+          }
+        };
       }
     });
 
-    if (this.selectedHeroes.length > 0) {
-      if (this.heroSelectionTitle) this.heroSelectionTitle.textContent = 'Select your 3 heroes';
-      this.heroDrawer.classList.remove('hidden');
-    } else {
-      if (this.heroSelectionTitle) this.heroSelectionTitle.textContent = 'Hero Selection';
-      this.heroDrawer.classList.add('hidden');
-    }
-
-    if (this.selectedHeroes.length === 3) {
-      this.btnHeroContinue.classList.remove('disabled');
-      this.btnHeroContinue.classList.add('primary');
-      this.btnHeroContinue.textContent = 'Play';
-    } else {
-      this.btnHeroContinue.classList.add('disabled');
-      this.btnHeroContinue.classList.remove('primary');
-      this.btnHeroContinue.textContent = 'Select to continue';
+    if (this.btnHeroContinue) {
+      if (this.selectedHeroes.length === 3) {
+        this.btnHeroContinue.classList.remove('disabled');
+      } else {
+        this.btnHeroContinue.classList.add('disabled');
+      }
     }
   }
 
-  updateHeroDrawer(hero, show = true) {
-    if (show) {
-      this.heroDrawer.classList.remove('hidden');
-    } else {
-      this.heroDrawer.classList.add('hidden');
+  setScanState(isScanned) {
+    this.isCardScanned = !!isScanned;
+    if (this.scanViewportWindow) {
+      if (this.isCardScanned) {
+        this.scanViewportWindow.classList.add('scanned');
+        if (this.scanStatusBadge) this.scanStatusBadge.textContent = 'Card Detected! Ready to Play';
+        if (this.btnScanContinue) this.btnScanContinue.classList.remove('disabled');
+      } else {
+        this.scanViewportWindow.classList.remove('scanned');
+        if (this.scanStatusBadge) this.scanStatusBadge.textContent = 'Searching for Card...';
+        if (this.btnScanContinue) this.btnScanContinue.classList.add('disabled');
+      }
     }
-    this.drawerAvatar.src = hero.icon;
-    this.drawerHeroName.textContent = hero.name;
-    this.drawerCategory.textContent = hero.class;
-    this.drawerHpVal.textContent = hero.hp.toString();
-    this.drawerHpBar.style.width = `${Math.min(100, (hero.hp / 180) * 100)}%`;
-    this.drawerAtkVal.textContent = hero.atk.toString();
-    this.drawerAtkBar.style.width = `${Math.min(100, (hero.atk / 80) * 100)}%`;
-    this.drawerUltDesc.textContent = hero.ultDesc;
+  }
+
+  showScanningReticle(heroName) {
+    this.setScanState(false);
+  }
+
+  hideScanningReticle() {
+    this.setScanState(true);
+  }
+
+  showCombatAlert(type, text) {
+    if (!this.combatAlertBox) return;
+    this.combatAlertBox.className = `combat-alert-box ${type}`;
+    if (this.alertText) this.alertText.textContent = text;
+    if (this.alertIcon) {
+      if (type === 'incoming') this.alertIcon.textContent = '▲';
+      else if (type === 'damage-dealt') this.alertIcon.textContent = '🔥';
+      else if (type === 'damage-taken') this.alertIcon.textContent = '💧';
+      else if (type === 'neutralized') this.alertIcon.textContent = '💀';
+      else this.alertIcon.textContent = '!';
+    }
+    if (this.combatAlertWrap) {
+      this.combatAlertWrap.classList.remove('hidden');
+    }
   }
 
   updateCombatHUD(state) {
     if (!state) return;
     const { playerActive, opponentActive, currentTurn, phase } = state;
 
-    // Update Player 1 Active
+    // 1. Update Player Active Vanguard
     if (playerActive) {
-      this.hudP1Avatar.src = playerActive.icon;
-      this.hudP1HeroName.textContent = playerActive.name;
-      this.hudP1Hp.textContent = Math.max(0, playerActive.currentHp).toString();
-      const p1Pct = Math.max(0, (playerActive.currentHp / playerActive.maxHp) * 100);
-      this.hudP1HpBar.style.width = `${p1Pct}%`;
-    }
-
-    // Update Player 2 / AI Active
-    if (opponentActive) {
-      this.hudP2Avatar.src = opponentActive.icon;
-      this.hudP2HeroName.textContent = opponentActive.name;
-      this.hudP2Hp.textContent = Math.max(0, opponentActive.currentHp).toString();
-      const p2Pct = Math.max(0, (opponentActive.currentHp / opponentActive.maxHp) * 100);
-      this.hudP2HpBar.style.width = `${p2Pct}%`;
-    }
-
-    // Turn Banner
-    if (currentTurn === 'player') {
-      this.turnBannerText.textContent = phase === 1 ? 'YOUR TURN: ATTACK' : 'TACTICAL INTERCEPT';
-      this.turnAnnouncement.style.borderColor = 'var(--game-blue)';
-    } else {
-      this.turnBannerText.textContent = 'OPPONENT TURN';
-      this.turnAnnouncement.style.borderColor = 'var(--game-yellow)';
-    }
-
-    // Action button states
-    const isPlayerTurn = currentTurn === 'player' && phase === 1;
-    if (isPlayerTurn) {
-      this.btnAttack.classList.remove('disabled');
-      const canUlt = playerActive && playerActive.currentMeter >= playerActive.ultThreshold;
-      if (canUlt) {
-        this.btnUltimate.classList.remove('disabled');
-      } else {
-        this.btnUltimate.classList.add('disabled');
+      if (this.playerAvatarImg) this.playerAvatarImg.src = playerActive.icon;
+      if (this.playerHpRing) {
+        const pct = Math.max(0, playerActive.currentHp / playerActive.maxHp);
+        const offset = 276 * (1 - pct);
+        this.playerHpRing.style.strokeDashoffset = offset;
       }
-    } else {
-      this.btnAttack.classList.add('disabled');
-      this.btnUltimate.classList.add('disabled');
     }
 
-    // Update Reserve Squad on Bottom Right
-    this.renderReserveSquad(state.playerSquad, state.playerActive);
-  }
+    // 2. Update Enemy Hero
+    if (opponentActive) {
+      if (this.enemyAvatarImg) this.enemyAvatarImg.src = opponentActive.icon;
+      if (this.enemyHeroName) this.enemyHeroName.textContent = opponentActive.name;
+      if (this.enemyHpRing) {
+        const pct = Math.max(0, opponentActive.currentHp / opponentActive.maxHp);
+        const offset = 276 * (1 - pct);
+        this.enemyHpRing.style.strokeDashoffset = offset;
+      }
+    }
 
-  renderReserveSquad(squad, activeHero) {
-    this.reserveSquad.innerHTML = '';
-    squad.forEach(hero => {
-      if (hero.id === activeHero.id) return; // Skip active
-
-      const slot = document.createElement('div');
-      slot.className = 'reserve-hero-slot';
-      if (hero.class === 'Tank') slot.classList.add('yellow-ring');
-      else if (hero.class === 'Fighter') slot.classList.add('blue-ring');
-      else slot.classList.add('red-ring');
-
-      if (hero.isFainted) slot.classList.add('fainted');
-
-      const img = document.createElement('img');
-      img.src = hero.icon;
-      img.alt = hero.name;
-      img.className = 'reserve-avatar';
-      slot.appendChild(img);
-
-      slot.addEventListener('click', () => {
-        if (!hero.isFainted) {
-          this.onTacticalSwapClick(hero);
+    // 3. Update Reserve Heroes
+    const reserves = state.playerSquad.filter(h => h.id !== (playerActive && playerActive.id));
+    this.reserveSlots.forEach((slot, idx) => {
+      const hero = reserves[idx];
+      if (hero) {
+        slot.style.display = 'flex';
+        if (this.reserveImgs[idx]) this.reserveImgs[idx].src = hero.icon;
+        if (this.reserveHpRings[idx]) {
+          const pct = Math.max(0, hero.currentHp / hero.maxHp);
+          this.reserveHpRings[idx].style.strokeDashoffset = 276 * (1 - pct);
         }
-      });
-
-      this.reserveSquad.appendChild(slot);
+        slot.onclick = () => {
+          if (!hero.isFainted) this.onTacticalSwapClick(hero);
+        };
+      } else {
+        slot.style.display = 'none';
+      }
     });
+
+    // 4. Update Ultimate Button
+    const isPlayerTurn = currentTurn === 'player' && phase === 1;
+    const canUlt = playerActive && playerActive.currentMeter >= playerActive.ultThreshold;
+
+    if (canUlt && isPlayerTurn) {
+      this.btnCombatUltimate.className = 'ultimate-pill-btn on';
+      this.ultimateBtnLabel.textContent = 'Ultimate Strike';
+    } else {
+      this.btnCombatUltimate.className = 'ultimate-pill-btn off';
+      this.ultimateBtnLabel.textContent = 'Ultimate';
+    }
+
+    // 5. Update Turn Status Banner
+    if (currentTurn === 'player') {
+      this.showCombatAlert('your-turn', 'Your turn');
+    } else {
+      this.showCombatAlert('incoming', 'Incoming attack!');
+    }
   }
 
   showInterceptModal(attackData, squad, onSwapSelect) {
+    if (!this.interceptModal) return;
     this.interceptModal.classList.remove('hidden');
-    this.interceptDesc.textContent = `${attackData.attackerName} is launching a ${attackData.isUltimate ? 'DEVASTATING ULTIMATE' : 'Standard Strike'} for ${attackData.rawDamage} DMG!`;
+    if (this.interceptDesc) {
+      this.interceptDesc.textContent = `${attackData.attackerName} is launching a ${attackData.isUltimate ? 'DEVASTATING ULTIMATE' : 'Standard Strike'} for ${attackData.rawDamage} DMG! React before damage resolves!`;
+    }
 
-    this.swapOptions.innerHTML = '';
-    const reserves = squad.filter(h => !h.isFainted);
-    reserves.forEach(hero => {
-      const btn = document.createElement('button');
-      btn.className = 'figma-btn outline';
-      btn.style.width = 'auto';
-      btn.style.padding = '0 24px';
-      btn.textContent = `Swap: ${hero.name} (${hero.currentHp} HP)`;
-      btn.addEventListener('click', () => {
-        this.hideInterceptModal();
-        onSwapSelect(hero);
+    if (this.swapOptions) {
+      this.swapOptions.innerHTML = '';
+      const reserves = squad.filter(h => !h.isFainted);
+      reserves.forEach(hero => {
+        const btn = document.createElement('button');
+        btn.className = 'figma-pill-action-btn small';
+        btn.textContent = `Swap: ${hero.name} (${hero.currentHp} HP)`;
+        btn.addEventListener('click', () => {
+          this.hideInterceptModal();
+          onSwapSelect(hero);
+        });
+        this.swapOptions.appendChild(btn);
       });
-      this.swapOptions.appendChild(btn);
-    });
+    }
   }
 
   hideInterceptModal() {
-    this.interceptModal.classList.add('hidden');
-  }
-
-  showScanningReticle(heroName) {
-    if (this.arScanningOverlay) {
-      this.arScanningOverlay.classList.remove('hidden');
-      if (this.scanningHeroName) this.scanningHeroName.textContent = heroName;
-    }
-    if (this.turnBannerText) {
-      this.turnBannerText.textContent = 'SCAN HERO CARD';
+    if (this.interceptModal) {
+      this.interceptModal.classList.add('hidden');
     }
   }
-
-  hideScanningReticle() {
-    if (this.arScanningOverlay) {
-      this.arScanningOverlay.classList.add('hidden');
-    }
-    if (this.turnBannerText) {
-      this.turnBannerText.textContent = 'YOUR TURN';
-    }
-  }
-
-  setScanState(isScanned) {
-    this.isCardScanned = !!isScanned;
-    if (this.isCardScanned) {
-      if (this.scanTitle) this.scanTitle.textContent = 'Card Scanned';
-      if (this.scanWindow) this.scanWindow.classList.add('scanned');
-      if (this.btnScanAction) {
-        this.btnScanAction.className = 'figma-btn primary';
-        this.btnScanAction.textContent = 'Play';
-      }
-    } else {
-      if (this.scanTitle) this.scanTitle.textContent = 'Scanning Card';
-      if (this.scanWindow) this.scanWindow.classList.remove('scanned');
-      if (this.btnScanAction) {
-        this.btnScanAction.className = 'figma-btn disabled';
-        this.btnScanAction.textContent = 'Done';
-      }
-    }
-  }
-
 }
-

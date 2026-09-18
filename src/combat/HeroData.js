@@ -12,6 +12,7 @@ export const HEROES_LIST = [
     ultName: 'Overdrive',
     ultDesc: '+20 Attack Strength Boost',
     icon: '/assets/ui/profile/spiderman.webp',
+    cardImage: '/assets/ui/cards/spiderman.png',
     model: '/assets/characters/spiderman/spiderman.glb'
   },
   {
@@ -25,7 +26,8 @@ export const HEROES_LIST = [
     ultType: 'deal',
     ultName: 'Overdrive',
     ultDesc: '+30 ATK Unibeam Burst',
-    icon: '/assets/ui/profile/ironman.webp',
+    icon: '/assets/ui/profile/ironman_helmet.jpg',
+    cardImage: '/assets/ui/profile/ironman_helmet.jpg',
     model: '/assets/characters/spiderman/spiderman.glb'
   },
   {
@@ -40,6 +42,7 @@ export const HEROES_LIST = [
     ultName: 'Kinetic Bastion',
     ultDesc: 'Heal +40 HP & Reflect 50% DMG',
     icon: '/assets/ui/profile/thor.webp',
+    cardImage: '/assets/ui/cards/thor.png',
     model: '/assets/characters/thor/Thor.glb'
   },
   {

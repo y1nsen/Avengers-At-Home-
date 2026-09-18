@@ -68,7 +68,7 @@ class GameApp {
     this.network.on('matchAborted', data => {
       alert(data.reason || 'Match ended.');
       this.stopARCamera();
-      this.ui.switchScreen('landing');
+      this.ui.switchScreen('home');
     });
 
     // 5. UI Manager
@@ -275,8 +275,15 @@ class GameApp {
     if (event.type === 'DAMAGE_RESOLVED') {
       if (event.defenderSide === 'opponent') {
         this.vfx.triggerAttackBurst(new THREE.Vector3(0, 0.4, -0.6), 0xff0000);
+        this.ui.showCombatAlert('damage-dealt', `You did +${event.damage} damage`);
+        if (event.defenderFainted) {
+          setTimeout(() => {
+            this.ui.showCombatAlert('neutralized', 'Neutralized enemy');
+          }, 800);
+        }
       } else {
         this.character.onTakeDamage(event.damage, event.defenderHp);
+        this.ui.showCombatAlert('damage-taken', `You took -${event.damage} damage`);
       }
 
       // Check if now AI turn
